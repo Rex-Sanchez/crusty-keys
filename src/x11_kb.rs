@@ -1,8 +1,8 @@
 use std::{collections::HashMap, ffi::c_ulong, fmt::Display};
 
-use x11_dl::xlib::{self, AnyKey, AnyModifier, GrabModeAsync, LockMask, Mod2Mask, True};
+use x11_dl::xlib::{self, AnyKey, AnyModifier, GrabModeAsync, True};
 
-use crate::{KeyMap, logger::log};
+use crate::{logger::log, KeyMap};
 
 type ListenerID = (i32, u32);
 
@@ -90,7 +90,7 @@ pub struct X11Kb<'a> {
 }
 
 impl<'a> X11Kb<'a> {
-    pub fn new() -> crate::error::Result<Self> {
+    pub fn new() -> crate::error::AppResult<Self> {
         let xlib = xlib::Xlib::open()?;
 
         unsafe {
@@ -110,16 +110,11 @@ impl<'a> X11Kb<'a> {
 
     fn grab_key(&self, keymap: &'a KeyMap) -> Vec<(i32, u32)> {
         let key = keymap.map.code.to_code();
-        let modifiers = keymap.map.modifiers;
 
         // Because Numlock & Capslock are modifiers as well we need to add the keymaps with
         // these as well else the keymaps will not work if capslock and or numlock is on.
-        let modifiers = [
-            modifiers,
-            modifiers | Mod2Mask,
-            modifiers | LockMask,
-            modifiers | LockMask | Mod2Mask,
-        ];
+        let modifiers = keymap.map.modifiers.as_universal();
+        
 
         unsafe {
             let keycode = (self.xlib.XKeysymToKeycode)(self.display, key as u64) as i32;

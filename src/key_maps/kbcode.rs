@@ -1,19 +1,19 @@
 use x11_dl::{keysym, xlib};
 
 #[derive(Debug)]
-pub enum KbModifier {
+pub enum KbModifierCode {
     Alt,
     Ctrl,
     Super,
     Shift,
 }
-impl KbModifier {
+impl KbModifierCode {
     pub fn to_code(&self) -> u32 {
         match self {
-            KbModifier::Alt => xlib::Mod1Mask,
-            KbModifier::Ctrl => xlib::ControlMask,
-            KbModifier::Super => xlib::Mod4Mask,
-            KbModifier::Shift => xlib::ShiftMask,
+            KbModifierCode::Alt => xlib::Mod1Mask,
+            KbModifierCode::Ctrl => xlib::ControlMask,
+            KbModifierCode::Super => xlib::Mod4Mask,
+            KbModifierCode::Shift => xlib::ShiftMask,
         }
     }
 }
@@ -140,13 +140,13 @@ impl KbCode {
 }
 
 pub enum KeyKind {
-    Mod(KbModifier),
+    Mod(KbModifierCode),
     Code(KbCode),
     Unknown,
 }
 
-impl From<KbModifier> for KeyKind {
-    fn from(value: KbModifier) -> Self {
+impl From<KbModifierCode> for KeyKind {
+    fn from(value: KbModifierCode) -> Self {
         Self::Mod(value)
     }
 }
@@ -160,10 +160,10 @@ impl From<&str> for KeyKind {
     fn from(value: &str) -> Self {
         let value = value.to_lowercase();
         match value.as_str() {
-            "<super>" => KbModifier::Super.into(),
-            "<ctrl>" => KbModifier::Ctrl.into(),
-            "<alt>" => KbModifier::Alt.into(),
-            "<shift>" => KbModifier::Shift.into(),
+            "<super>" => KbModifierCode::Super.into(),
+            "<ctrl>" => KbModifierCode::Ctrl.into(),
+            "<alt>" => KbModifierCode::Alt.into(),
+            "<shift>" => KbModifierCode::Shift.into(),
 
             "<enter>" => KbCode::Enter.into(),
             "<space>" => KbCode::Space.into(),

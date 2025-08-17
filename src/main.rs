@@ -3,18 +3,16 @@ mod key_maps;
 mod logger;
 mod lua;
 mod x11_kb;
+pub mod macros;
+
 
 use std::{
     cmp::Ordering,
-    ops::{Deref, DerefMut},
     sync::{Arc, RwLock},
 };
 
 use crate::{
-    key_maps::Map,
-    logger::log,
-    lua::{KeyMapOptions, LuaEngine},
-    x11_kb::X11Kb,
+    error::AppResult, key_maps::Map, logger::log, lua::{KeyMapOptions, LuaEngine}, x11_kb::X11Kb
 };
 use clap::{Parser, Subcommand};
 use mlua::Function;
@@ -44,19 +42,8 @@ pub struct KeyMap {
 
 #[derive(Default, Clone)]
 pub struct Keymaps(pub Arc<RwLock<Vec<KeyMap>>>);
+crate::deref!(Keymaps => Arc<RwLock<Vec<KeyMap>>>);
 
-impl Deref for Keymaps {
-    type Target = Arc<RwLock<Vec<KeyMap>>>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-impl DerefMut for Keymaps {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
 
 impl Keymaps {
     fn print_maps(&self) {
@@ -98,9 +85,9 @@ impl Keymaps {
     }
 }
 
-fn run() -> crate::error::Result<()> {
+fn run() -> AppResult<()> {
     let engine = LuaEngine::new()?;
-    let keymaps = engine.keymaps.read().expect("Error: Could not keymap lock");
+    let keymaps = engine.keymaps.read().expect("Error: Could not get keymap lock");
     let args = AppArgs::parse();
 
     match args.mode {
@@ -116,7 +103,7 @@ fn run() -> crate::error::Result<()> {
     Ok(())
 }
 
-fn main() -> error::Result<()> {
+fn main() -> AppResult<()> {
     if let Err(e) = run() {
         log(e.to_string().as_str());
         eprintln!("{e}");

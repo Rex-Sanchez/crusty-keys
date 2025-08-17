@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use x11_dl::error::OpenError;
 
-pub type Result<T> = std::result::Result<T, AppError>;
+pub type AppResult<T> = std::result::Result<T, AppError>;
 
 #[derive(Debug)]
 pub enum AppError {
@@ -29,20 +29,8 @@ impl Display for AppError {
     }
 }
 
-impl From<OpenError> for AppError {
-    fn from(value: OpenError) -> Self {
-        Self::XlibOpen(value)
-    }
-}
-
-impl From<std::io::Error> for AppError {
-    fn from(value: std::io::Error) -> Self {
-        Self::IO(value)
-    }
-}
-
-impl From<mlua::Error> for AppError {
-    fn from(value: mlua::Error) -> Self {
-        Self::Lua(value)
-    }
-}
+crate::from!({
+    mlua::Error => Self::Lua,
+    std::io::Error => Self::IO,
+    OpenError => Self::XlibOpen
+} => AppError);

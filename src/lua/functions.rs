@@ -62,7 +62,7 @@ pub fn i3_msg(lua: &Lua, i3: I3) -> Result<Function, mlua::Error> {
     Ok(f)
 }
 
-pub fn keymap_set(lua: &Lua, keymaps: Keymaps) -> crate::error::Result<Function> {
+pub fn keymap_set(lua: &Lua, keymaps: Keymaps) -> crate::error::AppResult<Function> {
     let f = lua.create_function(
         move |_lua: &Lua, (keymap, cb, desc): (String, Function, Option<Table>)| {
             if let Ok(map) = Map::try_from(&keymap)

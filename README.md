@@ -11,7 +11,7 @@ you can break up your config into multiple files and just require them in the ma
 ```lua
 
 
-kbd.keymap.set("<keymap>", function() 
+ck.keymap.set("<keymap>", function() 
     -- Callback
 end, 
 { -- all options are optional
@@ -20,7 +20,7 @@ end,
 })
 
 
-kbd.util.run("cmd", 
+ck.util.run("cmd", 
 { -- all options are optional 
     env = {
         "Somekey" = "some valiable", -- set a env variable before running the command.
@@ -28,7 +28,7 @@ kbd.util.run("cmd",
     in_terminal = false -- run this command in a terminal window default is false 
 })
 
-kbd.util.i3("i3 command") -- this is eq to cmd with i3-msg but it uses IPC so its a bit more efficient.
+ck.util.i3("i3 command") -- this is eq to cmd with i3-msg but it uses IPC so its a bit more efficient.
 
 
 ```
@@ -36,41 +36,41 @@ kbd.util.i3("i3 command") -- this is eq to cmd with i3-msg but it uses IPC so it
 ## Example
 
 ```lua
-kbd.keymap.set("<super>+<shift>+<left>", function() 
-    kbd.util.i3("move left") 
+ck.keymap.set("<super>+<shift>+<left>", function() 
+    ck.util.i3("move left") 
 end, 
 { -- all options are optional
     group = "I3",
     desc = "Move container to the left"
 })
 
-kbd.keymap.set("<super>+<left>", function() 
-    kbd.util.i3("focus left") 
+ck.keymap.set("<super>+<left>", function() 
+    ck.util.i3("focus left") 
 end, 
 { -- all options are optional
     group = "I3",
     desc = "Move focus left"
 })
 
-kbd.keymap.set("<super>+1", function() 
-    kbd.util.run("firefox") 
+ck.keymap.set("<super>+1", function() 
+    ck.util.run("firefox") 
 end, 
 { -- all options are optional
     group = "Applications",
     desc = "Run Firefox",
 })
 
-kbd.keymap.set("<super>+o", function() 
-    kbd.util.run("nvim ~/.config/crusty-keys/config.lua", { in_terminal = true }) 
+ck.keymap.set("<super>+o", function() 
+    ck.util.run("nvim ~/.config/crusty-keys/config.lua", { in_terminal = true }) 
 end, 
 { -- all options are optional
     group = "Configs",
     desc = "Open Crusty-keys config",
 })
 
-kbd.keymap.set("<super>+2", function() 
-    kbd.util.i3("workspace 1") 
-    kbd.util.run("vesktop", { env = { KDG_SCALE = 1 }}) 
+ck.keymap.set("<super>+2", function() 
+    ck.util.i3("workspace 1") 
+    ck.util.run("vesktop", { env = { KDG_SCALE = 1 }}) 
 end, 
 { -- all options are optional
     group = "Applications",

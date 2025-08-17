@@ -10,7 +10,7 @@ use mlua::{Lua, Table};
 
 use crate::{
     Keymaps,
-    error::{AppError, Result},
+    error::{AppError, AppResult},
     lua::functions::{i3_msg, keymap_set, run},
 };
 
@@ -43,7 +43,7 @@ pub struct LuaEngine {
 }
 
 impl LuaEngine {
-    pub fn new() -> Result<Self> {
+    pub fn new() -> AppResult<Self> {
         let mut s = Self {
             lua: mlua::Lua::new(),
             i3: Arc::new(I3Connection::connect().ok().map(RwLock::new)),
@@ -72,29 +72,29 @@ impl LuaEngine {
         Ok(s)
     }
 
-    pub fn set_globals(&mut self) -> crate::error::Result<()> {
+    pub fn set_globals(&mut self) -> crate::error::AppResult<()> {
         // main table | rmux.
-        let kbd = self.lua.create_table()?;
+        let ck = self.lua.create_table()?;
 
         // keymap | kbd.keymap
-        kbd.set(
+        ck.set(
             "keymap",
             create_keymap_table(&self.lua, self.keymaps.clone())?,
         )?;
-        kbd.set("util", create_util_table(&self.lua, self.i3.clone())?)?;
+        ck.set("util", create_util_table(&self.lua, self.i3.clone())?)?;
 
-        let _ = self.lua.globals().set("kbd", kbd);
+        let _ = self.lua.globals().set("ck", ck);
         Ok(())
     }
 }
 
-fn create_keymap_table(lua: &Lua, keymaps: Keymaps) -> crate::error::Result<Table> {
+fn create_keymap_table(lua: &Lua, keymaps: Keymaps) -> crate::error::AppResult<Table> {
     let keymap = lua.create_table()?;
     let _ = keymap.set("set", keymap_set(lua, keymaps)?);
     Ok(keymap)
 }
 
-fn create_util_table(lua: &Lua, i3: I3) -> crate::error::Result<Table> {
+fn create_util_table(lua: &Lua, i3: I3) -> crate::error::AppResult<Table> {
     let util_table = lua.create_table()?;
     util_table.set("i3", i3_msg(lua, i3)?)?;
     util_table.set("run", run(lua)?)?;
@@ -110,9 +110,10 @@ pub struct KeyMapOptions {
 
 impl From<&Table> for KeyMapOptions {
     fn from(value: &Table) -> Self {
-        let group = value.get("group").ok();
-        let desc = value.get("desc").ok();
-        KeyMapOptions { group, desc }
+        KeyMapOptions {
+            group: value.get("group").ok(),
+            desc: value.get("desc").ok(),
+        }
     }
 }
 
