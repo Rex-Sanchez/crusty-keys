@@ -68,14 +68,34 @@ end,
     desc = "Open Crusty-keys config",
 })
 
-ck.keymap.set("<super>+2", function() 
-    ck.util.i3("workspace 1") 
-    ck.util.run("vesktop", { env = { KDG_SCALE = 1 }}) 
-end, 
-{ -- all options are optional
-    group = "Applications",
-    desc = "Move to workspace 1 and open vesktop",
-})
+
+
+-- We have all powers of lua so we can easily loop through some things
+local workspaces = {
+    { ws = 1, key = "f1" }, 
+    { ws = 2, key = "f2" }, 
+    { ws = 3, key = "f3" }, 
+    { ws = 4, key = "f4" }, 
+}
+
+for _, k in ipairs(workspaces) do 
+    ck.keymap.set(string.format("<super>+<%s>",k.key), function() 
+        ck.util.i3(string.format("workspace number ",k.ws)) 
+    end, 
+    { -- all options are optional
+        group = "I3",
+        desc = "Focus workspace number " .. k.ws
+    })
+    
+    ck.keymap.set(string.format("<super>+<shift>+<%s>",k.key), function() 
+        ck.util.i3(string.format("move container to workspace %s",k.ws)) 
+    end, 
+    { -- all options are optional
+        group = "I3",
+        desc = "Move container to workspace number " .. k.ws
+    })
+
+end
 
 
 ```
