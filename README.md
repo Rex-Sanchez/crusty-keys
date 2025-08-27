@@ -1,5 +1,5 @@
 # Crusty-keys
-Crusty-keys is a X11 shortcut daemon match like sxhkd but written in rust, and uses lua to configure itself it also has a buildin function for i3wm that uses the internal IPC so its more efficent then i3-msg
+Crusty-keys is a X11 shortcut daemon allot like sxhkd but written in rust, and uses lua to configure itself it also has a buildin function for i3wm that uses the internal IPC so its more efficent then i3-msg
 
 
 ## Config
@@ -23,7 +23,7 @@ end,
 ck.util.run("cmd", 
 { -- all options are optional 
     env = {
-        "Somekey" = "some valiable", -- set a env variable before running the command.
+        "key" = "val", -- set a env variable before running the command.
     },
     in_terminal = false -- run this command in a terminal window default is false 
 })
