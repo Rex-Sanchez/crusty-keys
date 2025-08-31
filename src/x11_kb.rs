@@ -2,7 +2,7 @@ use std::{collections::HashMap, ffi::c_ulong, fmt::Display};
 
 use x11_dl::xlib::{self, AnyKey, AnyModifier, GrabModeAsync, True};
 
-use crate::{logger::log, KeyMap};
+use crate::{KeyMap, logger::log};
 
 type ListenerID = (i32, u32);
 
@@ -71,7 +71,9 @@ impl<'a> From<&'a GrabKeyError<'a>> for String {
 impl<'a> Display for GrabKeyError<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            GrabKeyError::Unknown(e) =>  f.write_fmt(format_args!("Grabbing Keys: Unknown error: {e}")),
+            GrabKeyError::Unknown(e) => {
+                f.write_fmt(format_args!("Grabbing Keys: Unknown error: {e}"))
+            }
             GrabKeyError::AlreadyGrabbed(keymap) => {
                 f.write_fmt(format_args!("Grabbing Keys: Already Grabbed: {}", keymap.s))
             }
@@ -114,14 +116,22 @@ impl<'a> X11Kb<'a> {
         // Because Numlock & Capslock are modifiers as well we need to add the keymaps with
         // these as well else the keymaps will not work if capslock and or numlock is on.
         let modifiers = keymap.map.modifiers.as_universal();
-        
 
         unsafe {
             let keycode = (self.xlib.XKeysymToKeycode)(self.display, key as u64) as i32;
             modifiers
                 .into_iter()
                 .filter_map(|m| {
-                    let result = (self.xlib.XGrabKey)(
+
+                    
+                    // We first have to unregister our key grab before we can register it again
+                    // this so that if any othere window is hes a grab on the keymap it is firt
+                    // undone, this is needed because when we register a keygrab when its still
+                    // grabbed be a different window the grab will fail
+                    let _unregister =
+                        (self.xlib.XUngrabKey)(self.display, keycode, m, self.root);
+
+                    let register = (self.xlib.XGrabKey)(
                         self.display,
                         keycode,
                         m,
@@ -131,10 +141,10 @@ impl<'a> X11Kb<'a> {
                         GrabModeAsync,
                     );
 
-                    match result {
+                    match register {
                         1 => Some((keycode, m)),
                         _ => {
-                            let msg = GrabKeyError::from(result);
+                            let msg = GrabKeyError::from(register);
                             log(&msg);
                             eprintln!("{msg}");
                             None
@@ -153,6 +163,8 @@ impl<'a> X11Kb<'a> {
         });
     }
 
+    // We need to unregister all keys first before we can register new keys grabs, so we first need
+    // to do that before we register new once
     pub fn unregister_all(&self) {
         unsafe {
             let result = (self.xlib.XUngrabKey)(self.display, AnyKey, AnyModifier, self.root);

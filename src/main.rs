@@ -95,7 +95,7 @@ fn run() -> AppResult<()> {
         Mode::Daemon => {
             let mut kb = X11Kb::new()?;
             // we should first unregister all keybindings before applying new once else binding will fail
-            kb.unregister_all();
+            // kb.unregister_all();
             kb.register(&keymaps);
             kb.listen();
         }
