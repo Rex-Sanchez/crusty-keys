@@ -7,6 +7,19 @@ use crate::{KeyMap, logger::log};
 
 type ListenerID = (i32, u32);
 
+fn grab_key_code_to_msg(code: u8) -> Result<(), &'static str> {
+    match code {
+        BadAccess => Err(
+            "A client attempted to grab a key/button combination already grabbed by another client.",
+        ),
+        BadValue => Err(
+            "Some numeric value falls outside the range of values accepted by the request. Unless a specific range is specified for an argument, the full range defined by the argument’s type is accepted. Any argument defined as a set of alternatives can generate this error.",
+        ),
+        BadWindow => Err("A value for a Window argument does not name a defined Window."),
+        _ => Ok(()),
+    }
+}
+
 pub struct X11Kb<'a> {
     display: *mut xlib::Display,
     root: c_ulong,
@@ -52,17 +65,17 @@ impl<'a> X11Kb<'a> {
                     // this so that if any othere window has a grab on the keymap it is first
                     // undone, this is needed because when we register a keygrab when its still
                     // grabbed be a different window the grab will fail
-                    match (self.xlib.XUngrabKey)(self.display, keycode, modifier, self.root) as u8 {
-                        BadValue => {
-                            log("Keymap unregister error: BadValue");
-                        }
-                        BadWindow => {
-                            log("Keymap unregister error: BadAccess");
-                        }
-                        _ => (),
+                    if let Err(e) = grab_key_code_to_msg((self.xlib.XUngrabKey)(
+                        self.display,
+                        keycode,
+                        modifier,
+                        self.root,
+                    ) as u8)
+                    {
+                        log(format!("Ungrap key error: {e}"));
                     }
 
-                    match (self.xlib.XGrabKey)(
+                    match grab_key_code_to_msg((self.xlib.XGrabKey)(
                         self.display,
                         keycode,
                         modifier,
@@ -70,21 +83,13 @@ impl<'a> X11Kb<'a> {
                         True,
                         GrabModeAsync,
                         GrabModeAsync,
-                    ) as u8
+                    ) as u8)
                     {
-                        BadAccess => {
-                            log("Keymap register error: BadAccess");
+                        Err(e) => {
+                            log(format!("Grap key error: {e}"));
                             None
                         }
-                        BadValue => {
-                            log("keymap register error: BadValue");
-                            None
-                        }
-                        BadWindow => {
-                            log("kemap register error: BadWindow");
-                            None
-                        }
-                        _ => Some((keycode, modifier)),
+                        Ok(_) => Some((keycode, modifier)),
                     }
                 })
                 .collect::<Vec<_>>()
