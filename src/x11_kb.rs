@@ -113,25 +113,28 @@ impl<'a> X11Kb<'a> {
     fn grab_key(&self, keymap: &'a KeyMap) -> Vec<(i32, u32)> {
         let key = keymap.map.code.to_code();
 
-        // Because Numlock & Capslock are modifiers as well we need to add the keymaps with
-        // these as well else the keymaps will not work if capslock and or numlock is on.
-        let modifiers = keymap.map.modifiers.as_universal();
-
         unsafe {
             let keycode = (self.xlib.XKeysymToKeycode)(self.display, key as u64) as i32;
-            modifiers
+
+            // Because Numlock & Capslock are modifiers as well we need to add the keymaps with
+            // these as well. Else the keymap will not work if capslock and or numlock is on.
+            keymap
+                .map
+                .modifiers
+                .as_universal()
                 .into_iter()
-                .filter_map(|m| {
+                .filter_map(|modifier| {
                     // We first have to unregister our key grab before we can register it again
-                    // this so that if any othere window is hes a grab on the keymap it is firt
+                    // this so that if any othere window has a grab on the keymap it is first
                     // undone, this is needed because when we register a keygrab when its still
                     // grabbed be a different window the grab will fail
-                    let _unregister = (self.xlib.XUngrabKey)(self.display, keycode, m, self.root);
+                    let _unregister =
+                        (self.xlib.XUngrabKey)(self.display, keycode, modifier, self.root);
 
                     let register = (self.xlib.XGrabKey)(
                         self.display,
                         keycode,
-                        m,
+                        modifier,
                         self.root,
                         True,
                         GrabModeAsync,
@@ -139,7 +142,7 @@ impl<'a> X11Kb<'a> {
                     );
 
                     match register {
-                        1 => Some((keycode, m)),
+                        1 => Some((keycode, modifier)),
                         _ => {
                             let msg = GrabKeyError::from(register);
                             log(&msg);
@@ -165,11 +168,11 @@ impl<'a> X11Kb<'a> {
                 let mut event: xlib::XEvent = std::mem::zeroed();
                 (self.xlib.XNextEvent)(self.display, &mut event);
 
-                if event.get_type() == xlib::KeyPress
-                    && let Some(cb) = self
-                        .handlers
-                        .get(&(event.key.keycode as i32, event.key.state))
-                {
+                if let (true, Some(cb)) = (
+                    event.get_type() == xlib::KeyPress,
+                    self.handlers
+                        .get(&(event.key.keycode as i32, event.key.state)),
+                ) {
                     let _ = cb.call::<()>(());
                 }
             }
