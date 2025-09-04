@@ -57,7 +57,7 @@ impl<'a> X11Kb<'a> {
                             log("Keymap unregister error: BadValue");
                         }
                         BadWindow => {
-                            log("Keymap register error: BadAccess");
+                            log("Keymap unregister error: BadAccess");
                         }
                         _ => (),
                     }
