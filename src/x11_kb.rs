@@ -103,6 +103,7 @@ impl<'a> X11Kb<'a> {
             });
         });
     }
+
     pub fn listen(&self) {
         unsafe {
             loop {
