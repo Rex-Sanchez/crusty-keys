@@ -131,6 +131,7 @@ impl KbCode {
                 'j' => keysym::XK_j,
                 'k' => keysym::XK_k,
                 'l' => keysym::XK_l,
+                'm' => keysym::XK_m,
                 'n' => keysym::XK_n,
                 'o' => keysym::XK_o,
                 'p' => keysym::XK_p,
