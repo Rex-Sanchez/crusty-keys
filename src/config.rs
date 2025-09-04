@@ -42,7 +42,7 @@ impl Config {
             let _ = std::fs::File::create_new(&config_file_path);
             println!("New config file created.")
 
-        // if the $USER/.config exists but no config file is there we create a new one
+        // if $USER/.config/crusty-keys exists but no config file is there we create a new one
         } else if config_file_path.canonicalize().ok().is_none() {
             let _ = std::fs::File::create_new(&config_file_path);
             println!("New config file created.")
