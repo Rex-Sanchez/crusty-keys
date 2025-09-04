@@ -11,6 +11,8 @@ pub enum AppError {
     Lua(mlua::Error),
     ConfigCouldNotBeCreated,
     HomeEnvNotSet,
+    ReadLockError,
+    _WriteLockError,
 }
 
 impl std::error::Error for AppError {}
@@ -19,14 +21,18 @@ impl Display for AppError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             AppError::XlibOpen(e) => f.write_fmt(format_args!(
-                        "Could not open Xlib: {:#?} {}",
-                        e.kind(),
-                        e.detail()
-                    )),
+                "Could not open Xlib: {:#?} {}",
+                e.kind(),
+                e.detail()
+            )),
             AppError::IO(error) => f.write_fmt(format_args!("IO Error: {error}")),
             AppError::Lua(error) => f.write_fmt(format_args!("Lua Error: {error}")),
             AppError::ConfigCouldNotBeCreated => f.write_str("Unable to create config file."),
-            AppError::HomeEnvNotSet => f.write_str("Home env variable not set. Could not determen config location"),
+            AppError::HomeEnvNotSet => {
+                f.write_str("Home env variable not set. Could not determen config location")
+            }
+            AppError::ReadLockError => f.write_str("Could not get RLock"),
+            AppError::_WriteLockError => f.write_str("Could not get WLock"),
         }
     }
 }

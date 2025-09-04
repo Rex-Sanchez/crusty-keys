@@ -11,10 +11,7 @@ use i3ipc::I3Connection;
 use mlua::{Function, Lua, Table};
 
 use crate::{
-    KeyMap, Keymaps,
-    error::{AppError, AppResult},
-    key_maps::Map,
-    logger::log,
+    error::{AppError, AppResult}, key_maps::{KeyMapOptions, KeyMaps, Map}, logger::log, KeyMap 
 };
 
 pub type I3 = Arc<Option<RwLock<I3Connection>>>;
@@ -22,7 +19,7 @@ pub type I3 = Arc<Option<RwLock<I3Connection>>>;
 pub struct LuaEngine {
     lua: mlua::Lua,
     i3: I3,
-    pub keymaps: Keymaps,
+    pub keymaps: KeyMaps,
 }
 
 impl LuaEngine {
@@ -30,7 +27,7 @@ impl LuaEngine {
         Self {
             lua: mlua::Lua::new(),
             i3: Arc::new(I3Connection::connect().ok().map(RwLock::new)),
-            keymaps: Keymaps::default(),
+            keymaps: KeyMaps::default(),
         }
     }
 
@@ -133,22 +130,6 @@ impl LuaEngine {
         Ok(f)
     }
 }
-
-#[derive(Debug, Clone, Default)]
-pub struct KeyMapOptions {
-    pub group: Option<String>,
-    pub desc: Option<String>,
-}
-
-impl From<Table> for KeyMapOptions {
-    fn from(value: Table) -> Self {
-        KeyMapOptions {
-            group: value.get("group").ok(),
-            desc: value.get("desc").ok(),
-        }
-    }
-}
-
 #[derive(Default, Debug)]
 pub struct RunOptions {
     pub env: HashMap<String, String>,
