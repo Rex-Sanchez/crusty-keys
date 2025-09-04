@@ -1,6 +1,6 @@
 use std::{collections::HashMap, ffi::c_ulong, fmt::Display};
 
-use x11_dl::xlib::{self, AnyKey, AnyModifier, GrabModeAsync, True};
+use x11_dl::xlib::{self, GrabModeAsync, True};
 
 use crate::{KeyMap, logger::log};
 
@@ -122,14 +122,11 @@ impl<'a> X11Kb<'a> {
             modifiers
                 .into_iter()
                 .filter_map(|m| {
-
-                    
                     // We first have to unregister our key grab before we can register it again
                     // this so that if any othere window is hes a grab on the keymap it is firt
                     // undone, this is needed because when we register a keygrab when its still
                     // grabbed be a different window the grab will fail
-                    let _unregister =
-                        (self.xlib.XUngrabKey)(self.display, keycode, m, self.root);
+                    let _unregister = (self.xlib.XUngrabKey)(self.display, keycode, m, self.root);
 
                     let register = (self.xlib.XGrabKey)(
                         self.display,
@@ -161,19 +158,6 @@ impl<'a> X11Kb<'a> {
                 self.handlers.insert(id, &map.cb);
             });
         });
-    }
-
-    // We need to unregister all keys first before we can register new keys grabs, so we first need
-    // to do that before we register new once
-    pub fn unregister_all(&self) {
-        unsafe {
-            let result = (self.xlib.XUngrabKey)(self.display, AnyKey, AnyModifier, self.root);
-            if result != 0 {
-                let msg = UnGrabKeyError::from(result);
-                log(&msg);
-                eprintln!("{msg}");
-            }
-        }
     }
     pub fn listen(&self) {
         unsafe {

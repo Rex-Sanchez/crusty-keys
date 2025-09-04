@@ -86,7 +86,9 @@ impl Keymaps {
 }
 
 fn run() -> AppResult<()> {
-    let engine = LuaEngine::new()?;
+    let mut engine = LuaEngine::new();
+    engine.load()?;
+
     let keymaps = engine.keymaps.read().expect("Error: Could not get keymap lock");
     let args = AppArgs::parse();
 
@@ -94,8 +96,6 @@ fn run() -> AppResult<()> {
         Mode::List => engine.keymaps.print_maps(),
         Mode::Daemon => {
             let mut kb = X11Kb::new()?;
-            // we should first unregister all keybindings before applying new once else binding will fail
-            // kb.unregister_all();
             kb.register(&keymaps);
             kb.listen();
         }
