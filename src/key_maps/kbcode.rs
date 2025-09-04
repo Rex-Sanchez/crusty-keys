@@ -167,7 +167,7 @@ impl KbCode {
                 'w' => keysym::XK_w,
                 'x' => keysym::XK_x,
                 'y' => keysym::XK_y,
-                'z' => keysym::XK_x,
+                'z' => keysym::XK_z,
                 '1' => keysym::XK_1,
                 '2' => keysym::XK_2,
                 '3' => keysym::XK_3,
