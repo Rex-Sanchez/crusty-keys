@@ -5,7 +5,16 @@ mod lua;
 pub mod macros;
 mod x11_kb;
 
-use crate::{error::{AppError, AppResult}, key_maps::KeyMap, logger::log, lua::LuaEngine, x11_kb::X11Kb};
+
+use std::path::PathBuf;
+
+use crate::{
+    error::{AppError, AppResult},
+    key_maps::KeyMap,
+    logger::log,
+    lua::LuaEngine,
+    x11_kb::X11Kb,
+};
 use clap::{Parser, Subcommand};
 
 #[derive(Subcommand)]
@@ -19,20 +28,18 @@ enum Mode {
 #[derive(Parser)]
 #[command(version)]
 struct AppArgs {
+    #[arg(long, short)]
+    pub config: Option<PathBuf>,
     /// Mode to run as
     #[command(subcommand)]
     mode: Mode,
 }
 
 fn run() -> AppResult<()> {
-    let mut engine = LuaEngine::new();
-    engine.load()?;
-
-    let keymaps = engine
-        .keymaps
-        .read().map_err(|_| AppError::ReadLockError)?;
-
     let args = AppArgs::parse();
+    let engine = LuaEngine::new(&args)?;
+
+    let keymaps = engine.keymaps.read().map_err(|_| AppError::ReadLockError)?;
 
     match args.mode {
         Mode::List => engine.keymaps.print_maps(),
