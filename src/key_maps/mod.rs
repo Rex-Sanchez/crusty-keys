@@ -100,11 +100,6 @@ impl MapBuilder {
     }
 }
 
-
-
-
-
-
 #[derive(Default, Clone)]
 pub struct KeyMaps(pub Arc<RwLock<Vec<KeyMap>>>);
 crate::deref!(KeyMaps => Arc<RwLock<Vec<KeyMap>>>);

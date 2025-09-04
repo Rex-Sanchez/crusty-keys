@@ -2,9 +2,9 @@ mod error;
 mod key_maps;
 mod logger;
 mod lua;
+mod config;
 pub mod macros;
 mod x11_kb;
-
 
 use std::path::PathBuf;
 
@@ -28,6 +28,7 @@ enum Mode {
 #[derive(Parser)]
 #[command(version)]
 struct AppArgs {
+    /// User defined config
     #[arg(long, short)]
     pub config: Option<PathBuf>,
     /// Mode to run as
@@ -39,12 +40,11 @@ fn run() -> AppResult<()> {
     let args = AppArgs::parse();
     let engine = LuaEngine::new(&args)?;
 
-    let keymaps = engine.keymaps.read().map_err(|_| AppError::ReadLockError)?;
-
     match args.mode {
         Mode::List => engine.keymaps.print_maps(),
         Mode::Daemon => {
             let mut kb = X11Kb::new()?;
+            let keymaps = engine.keymaps.read().map_err(|_| AppError::ReadLockError)?;
             kb.register(&keymaps);
             kb.listen();
         }
