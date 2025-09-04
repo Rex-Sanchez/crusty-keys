@@ -1,8 +1,8 @@
-use std::{io::Write, path::PathBuf};
+use std::{fs::OpenOptions, io::Write, path::PathBuf};
 
 pub(crate) fn log<S: Into<String>>(msg: S) {
     let msg = msg.into();
-    eprintln!("{msg}");
+    println!("{msg}");
 
     if let Some(home) = std::env::home_dir() {
         let log = home.join(PathBuf::from(".config/crusty-keys/log.log"));
@@ -10,7 +10,8 @@ pub(crate) fn log<S: Into<String>>(msg: S) {
         if let Ok(v) = std::fs::exists(&log)
             && v
         {
-            let _ = std::fs::write(log, msg.as_bytes());
+            let mut file = OpenOptions::new().append(true).open(log).unwrap();
+            let _ = writeln!(file, "{msg}");
         } else if let Ok(mut file) = std::fs::File::create_new(log) {
             let _ = file.write_all(msg.as_bytes());
         }
