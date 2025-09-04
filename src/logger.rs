@@ -2,6 +2,8 @@ use std::{io::Write, path::PathBuf};
 
 pub(crate) fn log<S: Into<String>>(msg: S) {
     let msg = msg.into();
+    eprintln!("{msg}");
+
     if let Some(home) = std::env::home_dir() {
         let log = home.join(PathBuf::from(".config/crusty-keys/log.log"));
 

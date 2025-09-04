@@ -1,88 +1,11 @@
-use std::{collections::HashMap, ffi::c_ulong, fmt::Display};
+#![allow(non_upper_case_globals)]
+use std::{collections::HashMap, ffi::c_ulong};
 
-use x11_dl::xlib::{self, GrabModeAsync, True};
+use x11_dl::xlib::{self, BadAccess, BadValue, BadWindow, GrabModeAsync, True};
 
 use crate::{KeyMap, logger::log};
 
 type ListenerID = (i32, u32);
-
-enum UnGrabKeyError {
-    BadAccess,
-    BadValue,
-    BadWindow,
-    Unknown(i32),
-}
-
-impl From<i32> for UnGrabKeyError {
-    fn from(value: i32) -> Self {
-        match value {
-            1 => UnGrabKeyError::BadAccess,
-            2 => UnGrabKeyError::BadValue,
-            3 => UnGrabKeyError::BadWindow,
-            _ => UnGrabKeyError::Unknown(value),
-        }
-    }
-}
-
-impl<'a> From<&'a UnGrabKeyError> for String {
-    fn from(val: &'a UnGrabKeyError) -> Self {
-        val.to_string()
-    }
-}
-
-impl Display for UnGrabKeyError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            UnGrabKeyError::BadAccess => f.write_str("Ungrabing Keys: BadAccess"),
-            UnGrabKeyError::BadValue => f.write_str("Ungrabbing Keys: BadValue"),
-            UnGrabKeyError::Unknown(e) => {
-                f.write_fmt(format_args!("Ungrabbing Keys: Unknown error: {e}"))
-            }
-            UnGrabKeyError::BadWindow => f.write_str("Ungrabbing Keys: BadWindow"),
-        }
-    }
-}
-
-enum GrabKeyError<'a> {
-    #[allow(unused)]
-    AlreadyGrabbed(&'a KeyMap),
-    GrabInvalidTime,
-    GrabNotViewable,
-    GrabFrozen,
-    Unknown(i32),
-}
-
-impl<'a> From<i32> for GrabKeyError<'a> {
-    fn from(value: i32) -> Self {
-        match value {
-            2 => GrabKeyError::GrabInvalidTime,
-            3 => GrabKeyError::GrabNotViewable,
-            4 => GrabKeyError::GrabFrozen,
-            _ => GrabKeyError::Unknown(value),
-        }
-    }
-}
-
-impl<'a> From<&'a GrabKeyError<'a>> for String {
-    fn from(val: &'a GrabKeyError<'a>) -> Self {
-        val.to_string()
-    }
-}
-impl<'a> Display for GrabKeyError<'a> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            GrabKeyError::Unknown(e) => {
-                f.write_fmt(format_args!("Grabbing Keys: Unknown error: {e}"))
-            }
-            GrabKeyError::AlreadyGrabbed(keymap) => {
-                f.write_fmt(format_args!("Grabbing Keys: Already Grabbed: {}", keymap.s))
-            }
-            GrabKeyError::GrabInvalidTime => f.write_str("Grabbing Keys: Invalid time"),
-            GrabKeyError::GrabNotViewable => f.write_str("Grabbing Keys: Not viewable"),
-            GrabKeyError::GrabFrozen => f.write_str("Grabbing Keys: Frozen"),
-        }
-    }
-}
 
 pub struct X11Kb<'a> {
     display: *mut xlib::Display,
@@ -124,14 +47,22 @@ impl<'a> X11Kb<'a> {
                 .as_universal()
                 .into_iter()
                 .filter_map(|modifier| {
+
                     // We first have to unregister our key grab before we can register it again
                     // this so that if any othere window has a grab on the keymap it is first
                     // undone, this is needed because when we register a keygrab when its still
                     // grabbed be a different window the grab will fail
-                    let _unregister =
-                        (self.xlib.XUngrabKey)(self.display, keycode, modifier, self.root);
+                    match (self.xlib.XUngrabKey)(self.display, keycode, modifier, self.root) as u8 {
+                        BadValue => {
+                            log("Keymap unregister error: BadValue");
+                        }
+                        BadWindow => {
+                            log("Keymap register error: BadAccess");
+                        }
+                        _ => (),
+                    }
 
-                    let register = (self.xlib.XGrabKey)(
+                    match (self.xlib.XGrabKey)(
                         self.display,
                         keycode,
                         modifier,
@@ -139,16 +70,21 @@ impl<'a> X11Kb<'a> {
                         True,
                         GrabModeAsync,
                         GrabModeAsync,
-                    );
-
-                    match register {
-                        1 => Some((keycode, modifier)),
-                        _ => {
-                            let msg = GrabKeyError::from(register);
-                            log(&msg);
-                            eprintln!("{msg}");
+                    ) as u8
+                    {
+                        BadAccess => {
+                            log("Keymap register error: BadAccess");
                             None
                         }
+                        BadValue => {
+                            log("keymap register error: BadValue");
+                            None
+                        }
+                        BadWindow => {
+                            log("kemap register error: BadWindow");
+                            None
+                        }
+                        _ => Some((keycode, modifier)),
                     }
                 })
                 .collect::<Vec<_>>()

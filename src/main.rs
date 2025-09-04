@@ -55,7 +55,6 @@ fn run() -> AppResult<()> {
 fn main() -> AppResult<()> {
     if let Err(e) = run() {
         log(e.to_string().as_str());
-        eprintln!("{e}");
     }
     Ok(())
 }

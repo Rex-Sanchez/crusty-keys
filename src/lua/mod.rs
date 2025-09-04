@@ -173,7 +173,6 @@ mod cmd {
 
         if let Err(e) = e.spawn() {
             log(e.to_string().as_str());
-            eprintln!("spawn command failed: {e}");
         }
     }
 }
