@@ -159,6 +159,6 @@ All keys are casted to lowercase so casing does not matter
 <KP9>
 
 
-Any lowercase alpha numeric 
+Any lowercase alpha and single numeric 
 
 ```
