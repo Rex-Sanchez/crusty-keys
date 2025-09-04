@@ -85,11 +85,10 @@ impl LuaEngine {
                 let args = args.split_whitespace().collect::<Vec<&str>>();
 
                 if opt.in_terminal {
-                    util::spawn_cmd_in_terminal(args, opt);
+                    cmd::spawn_in_terminal(args, opt);
                 } else if let Some(cmd) = args.first() {
-                    util::spawn_cmd(cmd, args[1..].to_vec(), opt);
+                    cmd::spawn(cmd, args[1..].to_vec(), opt);
                 }
-
                 Ok(())
             },
         )?;
@@ -146,23 +145,23 @@ impl From<Option<Table>> for RunOptions {
 }
 
 
-mod util {
+mod cmd {
     use crate::{logger::log, lua::RunOptions};
     use std::{
         os::unix::process::CommandExt,
         process::{Command, Stdio},
     };
 
-    pub fn spawn_cmd_in_terminal(args: Vec<&str>, opt: RunOptions) {
+    pub fn spawn_in_terminal(args: Vec<&str>, opt: RunOptions) {
         if let Some((_, term)) =
             std::env::vars().find(|(k, v)| k.as_str() == "TERM" && !v.is_empty())
         {
             let args = ["-e"].into_iter().chain(args).collect();
-            spawn_cmd(&term, args, opt);
+            spawn(&term, args, opt);
         }
     }
 
-    pub fn spawn_cmd(cmd: &str, args: Vec<&str>, opt: RunOptions) {
+    pub fn spawn(cmd: &str, args: Vec<&str>, opt: RunOptions) {
         let mut e = Command::new(cmd);
         e.args(&args)
             .stdin(Stdio::null())

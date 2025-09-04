@@ -1,7 +1,9 @@
 use std::{fs::read_to_string, path::PathBuf};
 
-use crate::{error::{AppError, AppResult}, AppArgs};
-
+use crate::{
+    AppArgs,
+    error::{AppError, AppResult},
+};
 
 pub(crate) struct Config {
     pub(crate) cfg: String,
@@ -19,8 +21,8 @@ impl TryFrom<&AppArgs> for Config {
         {
             return Ok(Config {
                 cfg: config,
-                dir: path.to_string()
-            })
+                dir: path.to_string(),
+            });
         }
         eprintln!("Invalid config path... Using default");
         Err(())
@@ -29,13 +31,6 @@ impl TryFrom<&AppArgs> for Config {
 
 impl Config {
     pub(crate) fn new() -> AppResult<Self> {
-        let (config_dir, config_file_path) = Self::default_config_file_path()?;
-        Ok(Config {
-            cfg: read_to_string(&config_file_path)?,
-            dir: config_dir,
-        })
-    }
-    fn default_config_file_path() -> AppResult<(String, PathBuf)> {
         let home = std::env::home_dir().ok_or(AppError::HomeEnvNotSet)?;
         let config_dir_path = home.join(PathBuf::from(".config/crusty-keys"));
         let config_file_path = config_dir_path.join(PathBuf::from("config.lua"));
@@ -53,13 +48,12 @@ impl Config {
             println!("New config file created.")
         }
 
-        let path_string = config_dir_path
-            .to_str()
-            .map(|s| s.to_string())
-            .ok_or(AppError::ConfigCouldNotBeCreated)?;
-
-        Ok((path_string, config_file_path))
+        Ok(Config {
+            cfg: read_to_string(&config_file_path)?,
+            dir: config_dir_path
+                .to_str()
+                .map(|s| s.to_string())
+                .ok_or(AppError::ConfigCouldNotBeCreated)?,
+        })
     }
 }
-
-
