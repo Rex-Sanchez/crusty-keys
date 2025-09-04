@@ -13,12 +13,12 @@ use crate::{
     key_maps::{KeyMapOptions, KeyMaps, Map},
 };
 
-pub type I3 = Arc<Option<RwLock<I3Connection>>>;
+type I3 = Arc<Option<RwLock<I3Connection>>>;
 
-pub struct LuaEngine {
+pub(crate) struct LuaEngine {
     lua: mlua::Lua,
     i3: I3,
-    pub keymaps: KeyMaps,
+    pub(crate) keymaps: KeyMaps,
     config: Config,
 }
 
@@ -127,10 +127,11 @@ impl LuaEngine {
         Ok(f)
     }
 }
+
 #[derive(Default, Debug)]
-pub struct RunOptions {
-    pub env: HashMap<String, String>,
-    pub in_terminal: bool,
+struct RunOptions {
+    env: HashMap<String, String>,
+    in_terminal: bool,
 }
 
 impl From<Option<Table>> for RunOptions {
