@@ -155,6 +155,18 @@ All keys are casted to lowercase so casing does not matter
 <f11>
 <f12>
    
+<KP0>
+<KP1>
+<KP2>
+<KP3>
+<KP4>
+<KP5>
+<KP6>
+<KP7>
+<KP8>
+<KP9>
+
+
 Any lowercase alpha numeric 
 
 ```

@@ -51,6 +51,17 @@ pub enum KbCode {
     Comma,
     Period,
 
+    KP0,
+    KP1,
+    KP2,
+    KP3,
+    KP4,
+    KP5,
+    KP6,
+    KP7,
+    KP8,
+    KP9,
+
     F(u8),
     Char(char),
 }
@@ -82,6 +93,16 @@ impl KbCode {
             KbCode::Semicolon => keysym::XK_semicolon,
             KbCode::Comma => keysym::XK_comma,
             KbCode::Period => keysym::XK_period,
+            KbCode::KP0 => keysym::XK_KP_0,
+            KbCode::KP1 => keysym::XK_KP_1,
+            KbCode::KP2 => keysym::XK_KP_2,
+            KbCode::KP3 => keysym::XK_KP_3,
+            KbCode::KP4 => keysym::XK_KP_4,
+            KbCode::KP5 => keysym::XK_KP_5,
+            KbCode::KP6 => keysym::XK_KP_6,
+            KbCode::KP7 => keysym::XK_KP_7,
+            KbCode::KP8 => keysym::XK_KP_8,
+            KbCode::KP9 => keysym::XK_KP_9,
             KbCode::F(f) => match f {
                 1 => keysym::XK_F1,
                 2 => keysym::XK_F2,
@@ -209,6 +230,18 @@ impl From<&str> for KeyKind {
             "<f10>" => KbCode::F(10).into(),
             "<f11>" => KbCode::F(11).into(),
             "<f12>" => KbCode::F(12).into(),
+
+            "<KP0>" => KbCode::KP0.into(),
+            "<KP1>" => KbCode::KP1.into(),
+            "<KP2>" => KbCode::KP2.into(),
+            "<KP3>" => KbCode::KP3.into(),
+            "<KP4>" => KbCode::KP4.into(),
+            "<KP5>" => KbCode::KP5.into(),
+            "<KP6>" => KbCode::KP6.into(),
+            "<KP7>" => KbCode::KP7.into(),
+            "<KP8>" => KbCode::KP8.into(),
+            "<KP9>" => KbCode::KP9.into(),
+
             _ => {
                 if value.len() == 1
                     && let Some(char) = value.chars().next()
