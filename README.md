@@ -69,7 +69,6 @@ end,
 })
 
 
-
 -- We have all powers of lua so we can easily loop through some things
 local workspaces = {
     { ws = 1, key = "f1" }, 
@@ -157,6 +156,16 @@ All keys are casted to lowercase so casing does not matter
 <KP7>
 <KP8>
 <KP9>
+
+-- Audio control
+<AudioMute>
+<AudioMicMute>
+<AudioNext>
+<AudioPrev>
+<AudioStop>
+<AudioPlay>
+<AudioLowerVolume>
+<AudioRaiseVolume>
 
 
 Any lowercase alpha and single numeric 

@@ -62,6 +62,15 @@ pub enum KbCode {
     KP8,
     KP9,
 
+    XF86AudioMute,
+    XF86AudioMicMute,
+    XF86AudioNext,
+    XF86AudioPrev,
+    XF86AudioStop,
+    XF86AudioPlay,
+    XF86AudioLowerVolue,
+    XF86AudioRaiseVolume,
+
     F(u8),
     Char(char),
 }
@@ -93,6 +102,7 @@ impl KbCode {
             KbCode::Semicolon => keysym::XK_semicolon,
             KbCode::Comma => keysym::XK_comma,
             KbCode::Period => keysym::XK_period,
+
             KbCode::KP0 => keysym::XK_KP_0,
             KbCode::KP1 => keysym::XK_KP_1,
             KbCode::KP2 => keysym::XK_KP_2,
@@ -103,6 +113,16 @@ impl KbCode {
             KbCode::KP7 => keysym::XK_KP_7,
             KbCode::KP8 => keysym::XK_KP_8,
             KbCode::KP9 => keysym::XK_KP_9,
+
+            KbCode::XF86AudioMute => keysym::XF86XK_AudioMute,
+            KbCode::XF86AudioMicMute => keysym::XF86XK_AudioMicMute,
+            KbCode::XF86AudioNext => keysym::XF86XK_AudioNext,
+            KbCode::XF86AudioPrev => keysym::XF86XK_AudioPrev,
+            KbCode::XF86AudioStop => keysym::XF86XK_AudioStop,
+            KbCode::XF86AudioPlay => keysym::XF86XK_AudioPlay,
+            KbCode::XF86AudioLowerVolue => keysym::XF86XK_AudioLowerVolume,
+            KbCode::XF86AudioRaiseVolume => keysym::XF86XK_AudioRaiseVolume,
+
             KbCode::F(f) => match f {
                 1 => keysym::XK_F1,
                 2 => keysym::XK_F2,
@@ -288,6 +308,15 @@ impl From<&str> for KeyKind {
             "<KP7>" => KbCode::KP7.into(),
             "<KP8>" => KbCode::KP8.into(),
             "<KP9>" => KbCode::KP9.into(),
+
+            "<AudioMute>" => KbCode::XF86AudioMute.into(),
+            "<AudioMicMute>" => KbCode::XF86AudioMicMute.into(),
+            "<AudioNext>" => KbCode::XF86AudioNext.into(),
+            "<AudioPrev>" => KbCode::XF86AudioPrev.into(),
+            "<AudioStop>" => KbCode::XF86AudioStop.into(),
+            "<AudioPlay>" => KbCode::XF86AudioPlay.into(),
+            "<AudioLowerVolume>" => KbCode::XF86AudioLowerVolue.into(),
+            "<AudioRaiseVolume>" => KbCode::XF86AudioRaiseVolume.into(),
 
             _ => {
                 if value.len() == 1
