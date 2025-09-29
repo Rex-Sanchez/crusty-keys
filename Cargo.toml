@@ -14,4 +14,5 @@ clap = { version = "4.5.43", features = ["derive"] }
 mlua = { version = "0.11.1", features = ["lua54","macros", "serialize", "vendored" ] }
 i3ipc = "0.10.1"
 x11-dl = "2.21.0"
+regex = "1.11.3"
 

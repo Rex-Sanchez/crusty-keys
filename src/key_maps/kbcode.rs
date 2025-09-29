@@ -1,4 +1,7 @@
-use x11_dl::{keysym, xlib};
+use x11_dl::{
+    keysym,
+    xlib::{self},
+};
 
 #[derive(Debug)]
 pub enum KbModifierCode {
@@ -7,6 +10,14 @@ pub enum KbModifierCode {
     Super,
     Shift,
 }
+pub struct KbCode(u32);
+
+impl KbCode {
+    pub fn to_code(&self) -> u32 {
+        self.0
+    }
+}
+
 impl KbModifierCode {
     pub fn to_code(&self) -> u32 {
         match self {
@@ -18,7 +29,7 @@ impl KbModifierCode {
     }
 }
 
-pub enum KbCode {
+pub enum KbSym {
     Enter,
     Space,
     Backspace,
@@ -75,55 +86,55 @@ pub enum KbCode {
     Char(char),
 }
 
-impl KbCode {
+impl KbSym {
     pub fn to_code(&self) -> u32 {
         match self {
-            KbCode::Enter => keysym::XK_Return,
-            KbCode::Space => keysym::XK_space,
-            KbCode::Backspace => keysym::XK_BackSpace,
-            KbCode::Esc => keysym::XK_Escape,
-            KbCode::End => keysym::XK_End,
-            KbCode::Home => keysym::XK_Home,
-            KbCode::Insert => keysym::XK_Insert,
-            KbCode::Del => keysym::XK_Delete,
-            KbCode::Down => keysym::XK_Down,
-            KbCode::Up => keysym::XK_Up,
-            KbCode::Left => keysym::XK_Left,
-            KbCode::Right => keysym::XK_Right,
-            KbCode::PgUp => keysym::XK_Page_Up,
-            KbCode::PgDown => keysym::XK_Page_Down,
-            KbCode::Tab => keysym::XK_Tab,
-            KbCode::Minus => keysym::XK_minus,
-            KbCode::Equals => keysym::XK_equal,
-            KbCode::Quote => keysym::XK_quoteleft,
-            KbCode::Backtick => keysym::XK_quoteright,
-            KbCode::Backslash => keysym::XK_backslash,
-            KbCode::Slash => keysym::XK_slash,
-            KbCode::Semicolon => keysym::XK_semicolon,
-            KbCode::Comma => keysym::XK_comma,
-            KbCode::Period => keysym::XK_period,
+            KbSym::Enter => keysym::XK_Return,
+            KbSym::Space => keysym::XK_space,
+            KbSym::Backspace => keysym::XK_BackSpace,
+            KbSym::Esc => keysym::XK_Escape,
+            KbSym::End => keysym::XK_End,
+            KbSym::Home => keysym::XK_Home,
+            KbSym::Insert => keysym::XK_Insert,
+            KbSym::Del => keysym::XK_Delete,
+            KbSym::Down => keysym::XK_Down,
+            KbSym::Up => keysym::XK_Up,
+            KbSym::Left => keysym::XK_Left,
+            KbSym::Right => keysym::XK_Right,
+            KbSym::PgUp => keysym::XK_Page_Up,
+            KbSym::PgDown => keysym::XK_Page_Down,
+            KbSym::Tab => keysym::XK_Tab,
+            KbSym::Minus => keysym::XK_minus,
+            KbSym::Equals => keysym::XK_equal,
+            KbSym::Quote => keysym::XK_quoteleft,
+            KbSym::Backtick => keysym::XK_quoteright,
+            KbSym::Backslash => keysym::XK_backslash,
+            KbSym::Slash => keysym::XK_slash,
+            KbSym::Semicolon => keysym::XK_semicolon,
+            KbSym::Comma => keysym::XK_comma,
+            KbSym::Period => keysym::XK_period,
 
-            KbCode::KP0 => keysym::XK_KP_0,
-            KbCode::KP1 => keysym::XK_KP_1,
-            KbCode::KP2 => keysym::XK_KP_2,
-            KbCode::KP3 => keysym::XK_KP_3,
-            KbCode::KP4 => keysym::XK_KP_4,
-            KbCode::KP5 => keysym::XK_KP_5,
-            KbCode::KP6 => keysym::XK_KP_6,
-            KbCode::KP7 => keysym::XK_KP_7,
-            KbCode::KP8 => keysym::XK_KP_8,
-            KbCode::KP9 => keysym::XK_KP_9,
+            KbSym::KP0 => keysym::XK_KP_0,
+            KbSym::KP1 => keysym::XK_KP_1,
+            KbSym::KP2 => keysym::XK_KP_2,
+            KbSym::KP3 => keysym::XK_KP_3,
+            KbSym::KP4 => keysym::XK_KP_4,
+            KbSym::KP5 => keysym::XK_KP_5,
+            KbSym::KP6 => keysym::XK_KP_6,
+            KbSym::KP7 => keysym::XK_KP_7,
+            KbSym::KP8 => keysym::XK_KP_8,
+            KbSym::KP9 => keysym::XK_KP_9,
 
-            KbCode::XF86AudioMute => keysym::XF86XK_AudioMute,
-            KbCode::XF86AudioMicMute => keysym::XF86XK_AudioMicMute,
-            KbCode::XF86AudioNext => keysym::XF86XK_AudioNext,
-            KbCode::XF86AudioPrev => keysym::XF86XK_AudioPrev,
-            KbCode::XF86AudioStop => keysym::XF86XK_AudioStop,
-            KbCode::XF86AudioPlay => keysym::XF86XK_AudioPlay,
-            KbCode::XF86AudioLowerVolue => keysym::XF86XK_AudioLowerVolume,
-            KbCode::XF86AudioRaiseVolume => keysym::XF86XK_AudioRaiseVolume,
+            KbSym::XF86AudioMute => keysym::XF86XK_AudioMute,
+            KbSym::XF86AudioMicMute => keysym::XF86XK_AudioMicMute,
+            KbSym::XF86AudioNext => keysym::XF86XK_AudioNext,
+            KbSym::XF86AudioPrev => keysym::XF86XK_AudioPrev,
+            KbSym::XF86AudioStop => keysym::XF86XK_AudioStop,
+            KbSym::XF86AudioPlay => keysym::XF86XK_AudioPlay,
+            KbSym::XF86AudioLowerVolue => keysym::XF86XK_AudioLowerVolume,
+            KbSym::XF86AudioRaiseVolume => keysym::XF86XK_AudioRaiseVolume,
 
-            KbCode::F(f) => match f {
+            KbSym::F(f) => match f {
                 1 => keysym::XK_F1,
                 2 => keysym::XK_F2,
                 3 => keysym::XK_F3,
@@ -161,7 +172,7 @@ impl KbCode {
                 35 => keysym::XK_F35,
                 _ => unreachable!(),
             },
-            KbCode::Char(c) => match c {
+            KbSym::Char(c) => match c {
                 'a' => keysym::XK_a,
                 'b' => keysym::XK_b,
                 'c' => keysym::XK_c,
@@ -206,7 +217,8 @@ impl KbCode {
 
 pub enum KeyKind {
     Mod(KbModifierCode),
-    Code(KbCode),
+    KeySym(KbSym),
+    KeyCode(KbCode),
     Unknown,
 }
 
@@ -215,12 +227,16 @@ impl From<KbModifierCode> for KeyKind {
         Self::Mod(value)
     }
 }
-impl From<KbCode> for KeyKind {
-    fn from(value: KbCode) -> Self {
-        Self::Code(value)
+impl From<KbSym> for KeyKind {
+    fn from(value: KbSym) -> Self {
+        Self::KeySym(value)
     }
 }
-
+impl From<KbCode> for KeyKind {
+    fn from(value: KbCode) -> Self {
+        Self::KeyCode(value)
+    }
+}
 impl From<&str> for KeyKind {
     fn from(value: &str) -> Self {
         let value = value.to_lowercase();
@@ -230,104 +246,117 @@ impl From<&str> for KeyKind {
             "<alt>" => KbModifierCode::Alt.into(),
             "<shift>" => KbModifierCode::Shift.into(),
 
-            "<enter>" => KbCode::Enter.into(),
-            "<space>" => KbCode::Space.into(),
-            "<backspace>" => KbCode::Backspace.into(),
-            "<esc>" => KbCode::Esc.into(),
+            "<enter>" => KbSym::Enter.into(),
+            "<space>" => KbSym::Space.into(),
+            "<backspace>" => KbSym::Backspace.into(),
+            "<esc>" => KbSym::Esc.into(),
 
-            "<end>" => KbCode::End.into(),
-            "<home>" => KbCode::Home.into(),
-            "<insert>" => KbCode::Insert.into(),
-            "<del>" => KbCode::Del.into(),
+            "<end>" => KbSym::End.into(),
+            "<home>" => KbSym::Home.into(),
+            "<insert>" => KbSym::Insert.into(),
+            "<del>" => KbSym::Del.into(),
 
-            "<up>" => KbCode::Up.into(),
-            "<down>" => KbCode::Down.into(),
-            "<right>" => KbCode::Right.into(),
-            "<left>" => KbCode::Left.into(),
+            "<up>" => KbSym::Up.into(),
+            "<down>" => KbSym::Down.into(),
+            "<right>" => KbSym::Right.into(),
+            "<left>" => KbSym::Left.into(),
 
-            "<pgdown>" => KbCode::PgDown.into(),
-            "<pgup>" => KbCode::PgUp.into(),
+            "<pgdown>" => KbSym::PgDown.into(),
+            "<pgup>" => KbSym::PgUp.into(),
 
-            "<tab>" => KbCode::Tab.into(),
+            "<tab>" => KbSym::Tab.into(),
 
-            "<equals>" => KbCode::Equals.into(),
-            "<minus>" => KbCode::Minus.into(),
+            "<equals>" => KbSym::Equals.into(),
+            "<minus>" => KbSym::Minus.into(),
 
-            "<quote>" => KbCode::Quote.into(),
-            "<backtick>" => KbCode::Backtick.into(),
-            "<backslash>" => KbCode::Backslash.into(),
-            "<slash>" => KbCode::Slash.into(),
-            "<semicolon>" => KbCode::Semicolon.into(),
+            "<quote>" => KbSym::Quote.into(),
+            "<backtick>" => KbSym::Backtick.into(),
+            "<backslash>" => KbSym::Backslash.into(),
+            "<slash>" => KbSym::Slash.into(),
+            "<semicolon>" => KbSym::Semicolon.into(),
 
-            "<comma>" => KbCode::Comma.into(),
-            "<period>" => KbCode::Period.into(),
+            "<comma>" => KbSym::Comma.into(),
+            "<period>" => KbSym::Period.into(),
 
-            "<f1>" => KbCode::F(1).into(),
-            "<f2>" => KbCode::F(2).into(),
-            "<f3>" => KbCode::F(3).into(),
-            "<f4>" => KbCode::F(4).into(),
-            "<f5>" => KbCode::F(5).into(),
-            "<f6>" => KbCode::F(6).into(),
-            "<f7>" => KbCode::F(7).into(),
-            "<f8>" => KbCode::F(8).into(),
-            "<f9>" => KbCode::F(9).into(),
-            "<f10>" => KbCode::F(10).into(),
-            "<f11>" => KbCode::F(11).into(),
-            "<f12>" => KbCode::F(12).into(),
-            "<f13>" => KbCode::F(13).into(),
-            "<f14>" => KbCode::F(14).into(),
-            "<f15>" => KbCode::F(15).into(),
-            "<f16>" => KbCode::F(16).into(),
-            "<f17>" => KbCode::F(17).into(),
-            "<f18>" => KbCode::F(18).into(),
-            "<f19>" => KbCode::F(19).into(),
-            "<f20>" => KbCode::F(20).into(),
-            "<f21>" => KbCode::F(21).into(),
-            "<f22>" => KbCode::F(22).into(),
-            "<f23>" => KbCode::F(23).into(),
-            "<f24>" => KbCode::F(24).into(),
-            "<f25>" => KbCode::F(25).into(),
-            "<f26>" => KbCode::F(26).into(),
-            "<f27>" => KbCode::F(27).into(),
-            "<f28>" => KbCode::F(28).into(),
-            "<f29>" => KbCode::F(29).into(),
-            "<f30>" => KbCode::F(30).into(),
-            "<f31>" => KbCode::F(31).into(),
-            "<f32>" => KbCode::F(32).into(),
-            "<f33>" => KbCode::F(33).into(),
-            "<f34>" => KbCode::F(34).into(),
-            "<f35>" => KbCode::F(35).into(),
+            "<f1>" => KbSym::F(1).into(),
+            "<f2>" => KbSym::F(2).into(),
+            "<f3>" => KbSym::F(3).into(),
+            "<f4>" => KbSym::F(4).into(),
+            "<f5>" => KbSym::F(5).into(),
+            "<f6>" => KbSym::F(6).into(),
+            "<f7>" => KbSym::F(7).into(),
+            "<f8>" => KbSym::F(8).into(),
+            "<f9>" => KbSym::F(9).into(),
+            "<f10>" => KbSym::F(10).into(),
+            "<f11>" => KbSym::F(11).into(),
+            "<f12>" => KbSym::F(12).into(),
+            "<f13>" => KbSym::F(13).into(),
+            "<f14>" => KbSym::F(14).into(),
+            "<f15>" => KbSym::F(15).into(),
+            "<f16>" => KbSym::F(16).into(),
+            "<f17>" => KbSym::F(17).into(),
+            "<f18>" => KbSym::F(18).into(),
+            "<f19>" => KbSym::F(19).into(),
+            "<f20>" => KbSym::F(20).into(),
+            "<f21>" => KbSym::F(21).into(),
+            "<f22>" => KbSym::F(22).into(),
+            "<f23>" => KbSym::F(23).into(),
+            "<f24>" => KbSym::F(24).into(),
+            "<f25>" => KbSym::F(25).into(),
+            "<f26>" => KbSym::F(26).into(),
+            "<f27>" => KbSym::F(27).into(),
+            "<f28>" => KbSym::F(28).into(),
+            "<f29>" => KbSym::F(29).into(),
+            "<f30>" => KbSym::F(30).into(),
+            "<f31>" => KbSym::F(31).into(),
+            "<f32>" => KbSym::F(32).into(),
+            "<f33>" => KbSym::F(33).into(),
+            "<f34>" => KbSym::F(34).into(),
+            "<f35>" => KbSym::F(35).into(),
 
-            "<KP0>" => KbCode::KP0.into(),
-            "<KP1>" => KbCode::KP1.into(),
-            "<KP2>" => KbCode::KP2.into(),
-            "<KP3>" => KbCode::KP3.into(),
-            "<KP4>" => KbCode::KP4.into(),
-            "<KP5>" => KbCode::KP5.into(),
-            "<KP6>" => KbCode::KP6.into(),
-            "<KP7>" => KbCode::KP7.into(),
-            "<KP8>" => KbCode::KP8.into(),
-            "<KP9>" => KbCode::KP9.into(),
+            "<KP0>" => KbSym::KP0.into(),
+            "<KP1>" => KbSym::KP1.into(),
+            "<KP2>" => KbSym::KP2.into(),
+            "<KP3>" => KbSym::KP3.into(),
+            "<KP4>" => KbSym::KP4.into(),
+            "<KP5>" => KbSym::KP5.into(),
+            "<KP6>" => KbSym::KP6.into(),
+            "<KP7>" => KbSym::KP7.into(),
+            "<KP8>" => KbSym::KP8.into(),
+            "<KP9>" => KbSym::KP9.into(),
 
-            "<AudioMute>" => KbCode::XF86AudioMute.into(),
-            "<AudioMicMute>" => KbCode::XF86AudioMicMute.into(),
-            "<AudioNext>" => KbCode::XF86AudioNext.into(),
-            "<AudioPrev>" => KbCode::XF86AudioPrev.into(),
-            "<AudioStop>" => KbCode::XF86AudioStop.into(),
-            "<AudioPlay>" => KbCode::XF86AudioPlay.into(),
-            "<AudioLowerVolume>" => KbCode::XF86AudioLowerVolue.into(),
-            "<AudioRaiseVolume>" => KbCode::XF86AudioRaiseVolume.into(),
+            "<XF86AudioMute>" => KbSym::XF86AudioMute.into(),
+            "<XF86AudioMicMute>" => KbSym::XF86AudioMicMute.into(),
+            "<XF86AudioNext>" => KbSym::XF86AudioNext.into(),
+            "<XF86AudioPrev>" => KbSym::XF86AudioPrev.into(),
+            "<XF86AudioStop>" => KbSym::XF86AudioStop.into(),
+            "<XF86AudioPlay>" => KbSym::XF86AudioPlay.into(),
+            "<XF86AudioLowerVolume>" => KbSym::XF86AudioLowerVolue.into(),
+            "<XF86AudioRaiseVolume>" => KbSym::XF86AudioRaiseVolume.into(),
 
             _ => {
                 if value.len() == 1
                     && let Some(char) = value.chars().next()
                     && char.is_ascii_alphanumeric()
                 {
-                    KbCode::Char(char).into()
+                    KbSym::Char(char).into()
                 } else {
+                    if let Some(code) = extract_keycode(&value) {
+                        return KbCode(code).into();
+                    }
                     KeyKind::Unknown
                 }
             }
         }
     }
+}
+
+fn extract_keycode(code: &str) -> Option<u32> {
+    regex::Regex::new(r#"\[(.*)\]"#)
+        .ok()?
+        .captures_iter(code)
+        .map(|c| c.extract())
+        .map(|(_, [value])| value.parse::<u32>().ok())
+        .next()
+        .flatten()
 }

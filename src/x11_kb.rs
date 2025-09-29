@@ -3,7 +3,7 @@ use std::{collections::HashMap, ffi::c_ulong};
 
 use x11_dl::xlib::{self, BadAccess, BadValue, BadWindow, GrabModeAsync, True};
 
-use crate::{KeyMap, logger::log};
+use crate::{key_maps::KbCodeType, logger::log, KeyMap};
 
 type ListenerID = (i32, u32);
 
@@ -47,10 +47,12 @@ impl<'a> X11Kb<'a> {
     }
 
     fn grab_key(&self, keymap: &'a KeyMap) -> Vec<(i32, u32)> {
-        let key = keymap.map.code.to_code();
-
         unsafe {
-            let keycode = (self.xlib.XKeysymToKeycode)(self.display, key as u64) as i32;
+            let keycode = match keymap.map.code {
+                KbCodeType::Sym(ref kb_sym) => (self.xlib.XKeysymToKeycode)(self.display, kb_sym.to_code() as u64) as i32,
+                KbCodeType::Code(ref kb_code) => kb_code.to_code() as i32,
+            };
+
 
             // Because Numlock & Capslock are modifiers as well we need to add the keymaps with
             // these as well. Else the keymap will not work if capslock and or numlock is on.
@@ -60,7 +62,6 @@ impl<'a> X11Kb<'a> {
                 .as_universal()
                 .into_iter()
                 .filter_map(|modifier| {
-
                     // We first have to unregister our key grab before we can register it again
                     // this so that if any othere window has a grab on the keymap it is first
                     // undone, this is needed because when we register a keygrab when its still

@@ -5,7 +5,7 @@ use std::{cmp::Ordering, ops::BitOrAssign, sync::{Arc, RwLock}};
 use mlua::{Function, Table};
 use x11_dl::xlib::{LockMask, Mod2Mask};
 
-use crate::key_maps::kbcode::{KbCode, KbModifierCode, KeyKind};
+use crate::key_maps::kbcode::{KbCode, KbModifierCode, KbSym, KeyKind};
 
 #[derive(Debug, Clone, Default)]
 pub struct KeyMapOptions {
@@ -57,9 +57,15 @@ impl BitOrAssign<KbModifierCode> for Modifier {
     }
 }
 
+pub enum KbCodeType{
+    Sym(KbSym),
+    Code(KbCode)
+}
+
+
 pub struct Map {
     pub modifiers: Modifier,
-    pub code: KbCode,
+    pub code: KbCodeType,
 }
 
 impl TryFrom<&String> for Map {
@@ -67,14 +73,15 @@ impl TryFrom<&String> for Map {
     fn try_from(value: &String) -> Result<Self, Self::Error> {
         let event = value
             .split("+")
-            .fold(MapBuilder::default(), |mut event, s| {
+            .fold(MapBuilder::default(), |mut map, s| {
                 let s = s.trim();
                 match KeyKind::from(s) {
-                    KeyKind::Mod(kb_modifier) => event.modifiers |= kb_modifier,
-                    KeyKind::Code(kb_code) => event.code = Some(kb_code),
-                    KeyKind::Unknown => event.code = None,
+                    KeyKind::Mod(kb_modifier) => map.modifiers |= kb_modifier,
+                    KeyKind::KeySym(kb_code) => map.code = Some(KbCodeType::Sym(kb_code)),
+                    KeyKind::KeyCode(kb_code) => map.code =  Some(KbCodeType::Code(kb_code)),
+                    KeyKind::Unknown => map.code = None,
                 }
-                event
+                map
             });
         event.build()
     }
@@ -83,7 +90,7 @@ impl TryFrom<&String> for Map {
 #[derive(Default)]
 pub struct MapBuilder {
     pub modifiers: Modifier,
-    pub code: Option<KbCode>,
+    pub code: Option<KbCodeType>,
 }
 
 impl MapBuilder {

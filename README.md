@@ -100,7 +100,7 @@ end
 ```
 
 
-## Supported keymaps (for now there is no support for direct keycodes)
+## Supported keymaps 
 All keys are casted to lowercase so casing does not matter 
 
 ```
@@ -158,16 +158,18 @@ All keys are casted to lowercase so casing does not matter
 <KP9>
 
 -- Audio control
-<AudioMute>
-<AudioMicMute>
-<AudioNext>
-<AudioPrev>
-<AudioStop>
-<AudioPlay>
-<AudioLowerVolume>
-<AudioRaiseVolume>
+<XF86AudioMute>
+<XF86AudioMicMute>
+<XF86AudioNext>
+<XF86AudioPrev>
+<XF86AudioStop>
+<XF86AudioPlay>
+<XF86AudioLowerVolume>
+<XF86AudioRaiseVolume>
 
+-- Keycodes
+[keycode]
 
-Any lowercase alpha and single numeric 
+-- Any lowercase alpha and single numeric 
 
 ```
